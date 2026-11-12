@@ -6,8 +6,8 @@
 ## Delivered
 
 - `docs/02-domain-model.md`: nine-entity ERD, proposed PostgreSQL field types, relationships, constraints, indexes and transaction boundaries.
-- `docs/03-donation-state-machine.md`: separate Donation and Claim state machines, transition actors/preconditions/effects, plus assignment and handover-code lifecycle notes.
-- `docs/04-api-contract.md`: proposed REST endpoints, roles, payload/response examples and error conventions.
+- `docs/03-donation-state-machine.md`: separate Donation and Claim state machines, transition actors/preconditions/effects, assignment/code lifecycle, and Mermaid end-to-end relay/recovery flow.
+- `docs/04-api-contract.md`: proposed REST endpoints, roles, payload/response examples, error conventions, and Mermaid component architecture.
 - `docs/decisions/`: seven ADR-style open-decision proposals with reversible demo defaults and explicit approval status.
 - `docs/requirement-traceability.md`: FR/NFR/BR-to-model/API/test mapping and AT-01–AT-10 status.
 

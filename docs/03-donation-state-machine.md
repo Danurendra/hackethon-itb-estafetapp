@@ -6,6 +6,40 @@
 
 The state names below are canonical API/database values. SRS prose such as “Recipient Selected” maps to `RECIPIENT_SELECTED`; the earlier roadmap's illustrative `ASSIGNED` is not a second state. Donation, recipient assignment and claim state are separate. The frontend cannot perform a transition by changing a displayed status.
 
+## End-to-end relay flow
+
+This flow shows the successful relay and the overdue-claim recovery path. It is a proposed behavior flow, not an implementation claim; the open policy choices remain in `docs/decisions/`.
+
+```mermaid
+flowchart TD
+    Start([Start]) --> Draft[Donor creates a draft]
+    Draft --> Valid{Required fields complete and deadline valid?}
+    Valid -- No --> Errors[Show validation errors]
+    Errors --> Draft
+    Valid -- Yes --> Publish[Publish donation as OPEN]
+    Publish --> Rank[Rank recipients by explainable factors]
+    Rank --> Coordinator{Coordinator selects one recipient?}
+    Coordinator -- Defer --> Rank
+    Coordinator -- Select --> Selected[Set RECIPIENT_SELECTED]
+    Selected --> Claim{Volunteer claim succeeds before deadline?}
+    Claim -- Conflict --> Conflict[Return current claim state]
+    Claim -- No claim by deadline --> Unclaimed[Donation becomes EXPIRED]
+    Claim -- Yes --> Active[Create one ACTIVE claim]
+    Active --> Handover{Code valid and handover before deadline?}
+    Handover -- Invalid code --> Reject[Reject without state change]
+    Reject --> Active
+    Handover -- Verified --> Verified[Consume code and set PICKUP_VERIFIED]
+    Verified --> Receipt{Recipient confirms receipt?}
+    Receipt -- Yes --> Received[Set RECEIVED; relay complete]
+    Receipt -- Discrepancy --> Exception[Set EXCEPTION_REVIEW]
+    Active --> Missed[Deadline passes without verified handover]
+    Missed --> Recovery[Expire claim; set REASSIGNMENT_REQUIRED]
+    Recovery --> Decision{Coordinator recovery decision}
+    Decision -- Retry current recipient --> Selected
+    Decision -- Replace recipient --> Selected
+    Decision -- No recovery --> Expired[Set donation EXPIRED]
+```
+
 ## 1. Donation lifecycle
 
 ```mermaid

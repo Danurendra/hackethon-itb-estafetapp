@@ -15,6 +15,45 @@
 - Mutations are transaction-backed and return the committed state. A notification/map failure does not imply that the core state mutation failed or gets rolled back.
 - This document specifies future authorization requirements but does not implement authentication (Session 3).
 
+### Proposed component architecture
+
+The diagram distinguishes existing infrastructure from proposed domain components. The current API has health routes and an `asyncpg` readiness probe only. Authentication, domain routes, ORM/migrations, ranking, expiry and notification delivery are planned; they are not implemented by this Session 2 documentation.
+
+```mermaid
+flowchart TD
+    Browser[Mobile or desktop browser] --> Next[Next.js frontend]
+    Next -->|HTTPS and JSON| Api[FastAPI API]
+
+    subgraph Backend[FastAPI backend]
+        Api --> Auth[Authentication and role checks - Session 3]
+        Auth --> Domain[Domain and workflow services - proposed]
+        Domain --> Ranking[Deterministic ranking service - proposed]
+        Ranking -->|Factor values and explanations| Domain
+        Deadline[Deadline monitor - proposed] --> Domain
+        Health[Health routes - current] --> Probe[asyncpg readiness probe - current]
+        Delivery[Notification delivery worker - proposed]
+    end
+
+    subgraph Persistence[PostgreSQL persistence]
+        Repository[SQLAlchemy repository and Alembic - after team approval]
+        Database[(PostgreSQL 18)]
+    end
+
+    Domain --> Repository
+    Ranking --> Repository
+    Probe --> Database
+    Repository --> Database
+    Domain -->|Commit state event and notification intent together| Database
+    Delivery -->|Read pending intents and update delivery status| Database
+    Ranking -->|Optional distance lookup| Maps[Maps provider]
+    Maps -->|Distance or explicit incomplete result| Ranking
+    Delivery --> Push[Browser notification adapter - optional]
+    Push -.->|Optional web notification| Browser
+    Next -->|In-app state queries| Api
+```
+
+The database remains authoritative. Ranking/map failure yields an explicit incomplete result; notification delivery failure updates delivery status but does not roll back a committed workflow event.
+
 ## 2. Resource schemas
 
 The examples omit fields not relevant to the operation. UUIDs are strings in JSON.
