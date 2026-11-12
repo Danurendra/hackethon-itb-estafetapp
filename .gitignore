@@ -1,0 +1,28 @@
+# Local configuration
+.env
+.env.*
+!.env.example
+!frontend/.env.local.example
+frontend/.env.local
+frontend/.env.*.local
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+*.tsbuildinfo
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
