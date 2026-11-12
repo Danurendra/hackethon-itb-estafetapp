@@ -1,4 +1,4 @@
-# Estafet
+# hackethon-itb-estafet
 
 Estafet is a mobile-friendly food-rescue relay for one pilot community. This repository is being built session by session; the current milestone is **Session 1: local environment and walking skeleton**.
 

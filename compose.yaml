@@ -1,3 +1,5 @@
+name: hackethon-itb-estafet
+
 services:
   db:
     image: postgres:18-alpine
@@ -18,3 +20,4 @@ services:
 
 volumes:
   postgres-data:
+    name: hackethon-itb_postgres-data
